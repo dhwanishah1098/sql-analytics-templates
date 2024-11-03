@@ -1,13 +1,10 @@
--- Daily Flash Report: Today vs Yesterday vs Same Day Last Week
+-- Daily flash revenue report
 SELECT
-    'Today'                                     AS period,
-    SUM(revenue)                                AS revenue,
-    COUNT(DISTINCT order_id)                    AS orders,
-    COUNT(DISTINCT customer_id)                 AS customers
-FROM fact_sales WHERE order_date = CURRENT_DATE
-UNION ALL
-SELECT 'Yesterday', SUM(revenue), COUNT(DISTINCT order_id), COUNT(DISTINCT customer_id)
-FROM fact_sales WHERE order_date = CURRENT_DATE - 1
-UNION ALL
-SELECT 'Same Day Last Week', SUM(revenue), COUNT(DISTINCT order_id), COUNT(DISTINCT customer_id)
-FROM fact_sales WHERE order_date = CURRENT_DATE - 7;
+    order_date,
+    COUNT(DISTINCT order_id)   AS orders,
+    SUM(revenue)               AS daily_revenue,
+    AVG(revenue)               AS avg_order_value,
+    SUM(units_sold)            AS units
+FROM fact_sales
+WHERE order_date = CURRENT_DATE - INTERVAL '1 day'
+GROUP BY 1;
