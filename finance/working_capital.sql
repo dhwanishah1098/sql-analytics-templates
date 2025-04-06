@@ -1,12 +1,8 @@
--- Working Capital Components by Month
+-- Working capital components
 SELECT
-    DATE_TRUNC('month', date)::date AS month,
-    SUM(CASE WHEN account_type = 'Current Asset'     THEN balance ELSE 0 END) AS current_assets,
-    SUM(CASE WHEN account_type = 'Current Liability'  THEN balance ELSE 0 END) AS current_liabilities,
-    SUM(CASE WHEN account_type = 'Current Asset'     THEN balance ELSE 0 END) -
-    SUM(CASE WHEN account_type = 'Current Liability'  THEN balance ELSE 0 END) AS working_capital,
-    SUM(CASE WHEN account_type = 'Current Asset'     THEN balance ELSE 0 END) /
-    NULLIF(SUM(CASE WHEN account_type = 'Current Liability' THEN balance ELSE 0 END), 0) AS current_ratio
-FROM balance_sheet
-GROUP BY 1
-ORDER BY 1;
+    SUM(CASE WHEN account_type='receivable' THEN balance END) AS ar,
+    SUM(CASE WHEN account_type='inventory'  THEN balance END) AS inventory,
+    SUM(CASE WHEN account_type='payable'    THEN balance END) AS ap,
+    SUM(CASE WHEN account_type IN('receivable','inventory') THEN balance
+             WHEN account_type='payable' THEN -balance END)  AS net_working_capital
+FROM fact_balance_sheet WHERE snapshot_date = CURRENT_DATE;
